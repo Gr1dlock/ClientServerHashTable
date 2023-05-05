@@ -2,16 +2,16 @@
 
 #include <shared_mutex>
 
-struct Node
-{
-    std::shared_mutex mutex;
-    int key;
-    void *value;
-    Node *next;
-};
-
 class HashTable
 {
+    struct Node
+    {
+        std::shared_mutex mutex;
+        int key;
+        void *value;
+        Node *next;
+    };
+
 public:
     HashTable(int size);
     void insert(int key, void *value);

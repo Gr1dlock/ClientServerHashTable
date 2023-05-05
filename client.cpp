@@ -8,9 +8,9 @@
 
 int main(int argc, char **argv)
 {
-    if (argc != 3)
+    if (argc != 2)
     {
-        std::cerr << "Usage: " << argv[0] << " [hash table size] [commands count]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " [command count]" << std::endl;
         return 1;
     }
 
@@ -30,9 +30,9 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    for (int i = 0; i < atoi(argv[2]); i++)
+    for (int i = 0; i < atoi(argv[1]); i++)
     {
-        Command command = {static_cast<Action>(rand() % 3), rand() % atoi(argv[2]), NULL};
+        Command command = {static_cast<Action>(rand() % 3), rand(), NULL};
         sharedMemory->insert(command);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
