@@ -1,3 +1,5 @@
+#pragma once
+
 #include <mutex>
 
 #define SHM_KEY 0x1234

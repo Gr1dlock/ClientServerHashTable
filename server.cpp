@@ -4,8 +4,9 @@
 #include <chrono>
 #include <thread>
 #include <stdio.h>
-#include "include/shared_memory.h"
-#include "include/hash_table.h"
+#include "shared_memory.h"
+#include "hash_table.h"
+#include "thread_pool.h"
 
 void processCommand(Command command, HashTable *hashTable)
 {
@@ -34,8 +35,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    HashTable *hashTable = new HashTable(atoi(argv[1]));
-
     int shmid = shmget(SHM_KEY, 1024, 0666 | IPC_CREAT);
     if (shmid == -1)
     {
@@ -50,12 +49,15 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    HashTable *hashTable = new HashTable(atoi(argv[1]));
+    ThreadPool threadPool(std::thread::hardware_concurrency());
+
     while (true)
     {
         if (!sharedMemory->isEmpty())
         {
             Command command = sharedMemory->read();
-            processCommand(command, hashTable);
+            threadPool.enqueue(processCommand, command, hashTable);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
