@@ -13,12 +13,15 @@ void processCommand(Command command, HashTable *hashTable)
     switch (command.action)
     {
     case INSERT:
+        std::cout << "Inserting " << command.key << std::endl;
         hashTable->insert(command.key, command.value);
         break;
     case READ:
+        std::cout << "Reading " << command.key << std::endl;
         hashTable->read(command.key);
         break;
     case REMOVE:
+        std::cout << "Removing " << command.key << std::endl;
         hashTable->remove(command.key);
         break;
     default:
@@ -28,7 +31,6 @@ void processCommand(Command command, HashTable *hashTable)
 
 int main(int argc, char **argv)
 {
-
     if (argc != 2)
     {
         std::cerr << "Usage: " << argv[0] << " [hash table size]" << std::endl;
@@ -42,13 +44,14 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    SharedMemory *sharedMemory = reinterpret_cast<SharedMemory *>(shmat(shmid, NULL, 0));
-    if (sharedMemory == (void *)-1)
+    void *shmAddress = shmat(shmid, NULL, 0);
+    if (shmAddress == (void *)-1)
     {
         std::cerr << "Shared memory attach failed" << std::endl;
         return 1;
     }
 
+    SharedMemory *sharedMemory = new (shmAddress) SharedMemory();
     HashTable *hashTable = new HashTable(atoi(argv[1]));
     ThreadPool threadPool(std::thread::hardware_concurrency());
 
